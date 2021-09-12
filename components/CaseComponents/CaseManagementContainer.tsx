@@ -8,6 +8,9 @@ import CaseCategory from "./CaseCategory";
 import AddCaseModal from "./Modals/AddCaseModal";
 import { useQuery } from "urql";
 import AddCategoryModal from "./Modals/AddCategoryModal";
+import DeleteCaseModal from "./Modals/DeleteCaseModal";
+import DeleteCategoryModal from "./Modals/DeleteCategoryModal";
+import { nullableTypeAnnotation } from "@babel/types";
 
 /* 
   FEATURE 1 TODO:
@@ -18,10 +21,14 @@ import AddCategoryModal from "./Modals/AddCategoryModal";
   Make sure to replace the string that is currently
   in this variable 
 */
+
 export const ManagementContainerQuery = `
-query MyQuery {
-  __typename 
-}
+query ManagementContainerQuery {
+    category{
+      name
+      id
+    }
+  }
 `;
 // END TODO
 
@@ -35,7 +42,10 @@ const CaseManagementContainer: React.FC = (props) => {
     React.useState<boolean>(false);
   const [addCategoryModalOpen, setAddCategoryModalOpen] =
     React.useState<boolean>(false);
-
+  const [deleteCaseModalOpen, setDeleteCaseModalOpen] =
+    React.useState<boolean>(false);
+  const [deleteCategoryModalOpen, setDeleteCategoryModalOpen] =
+    React.useState<boolean>(false);
   /* NOTE: This uses */
   const [{ data, fetching, error }, executeQuery] = useQuery({
     query: ManagementContainerQuery,
@@ -51,6 +61,11 @@ const CaseManagementContainer: React.FC = (props) => {
           a CaseCategory for every category in the response.
           Remember, the response is stored in the "data" variable!
         */}
+        {data
+                ? data.category.map((n: ManagementCategory, index: number) =>{
+                  return <Grid item xs={4}> <CaseCategory key={index} category_id={n.id} />
+                    </Grid>;
+                }): "Something went wrong"}
 
         {/* END TODO */}
       </Grid>
@@ -65,6 +80,16 @@ const CaseManagementContainer: React.FC = (props) => {
         open={addCategoryModalOpen}
       />
 
+      <DeleteCaseModal
+        onClose={() => setDeleteCaseModalOpen(false)}
+        open={deleteCaseModalOpen}
+      />
+
+      <DeleteCategoryModal
+        onClose={() => setDeleteCategoryModalOpen(false)}
+        open={deleteCategoryModalOpen}
+      />
+
       <Container
         style={{
           width: "100%",
@@ -76,13 +101,13 @@ const CaseManagementContainer: React.FC = (props) => {
         <Button variant="dark" onClick={() => setAddCategoryModalOpen(true)}>
           Add Category
         </Button>
-        <Button variant="dark" onClick={() => "redirect"}>
+        <Button variant="dark" onClick={() => setDeleteCategoryModalOpen(true)}>
           Delete Category
         </Button>
         <Button variant="dark" onClick={() => setAddCaseModalOpen(true)}>
           Add Case
         </Button>
-        <Button variant="dark" onClick={() => "redirect"}>
+        <Button variant="dark" onClick={() => setDeleteCaseModalOpen(true)}>
           Delete Case
         </Button>
         <Button variant="dark" onClick={() => "redirect"}>
